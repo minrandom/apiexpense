@@ -49,7 +49,7 @@ class AuthController extends Controller
  
          return response()->json([
              'token' => $token
-         ]);
+         ],200);
      }
  
      // Log out user (invalidate token)
@@ -59,6 +59,6 @@ class AuthController extends Controller
  
          return response()->json([
              'message' => 'User successfully logged out'
-         ]);
+         ],200);
      }
 }
