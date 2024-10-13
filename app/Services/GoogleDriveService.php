@@ -5,6 +5,9 @@ namespace App\Services;
 use Google_Client;
 use Google_Service_Drive;
 use Illuminate\Http\UploadedFile;
+use App\Models\GoogleApiCredential;
+
+
 
 class GoogleDriveService
 {
@@ -20,27 +23,44 @@ class GoogleDriveService
         $this->client = new Google_Client();
         $this->client->setApplicationName('Your Application Name');
         $this->client->setScopes(Google_Service_Drive::DRIVE_FILE);
-        $this->client->setAuthConfig(base_path('app/credentials.json')); // Path to your credentials.json file
+        // Load Google API credentials from the database
+        $this->loadCredentialsFromDB();
+        // Load the access token from the database
         $this->loadAccessToken();
     }
 
     
-
-    protected function loadAccessToken()
+    protected function loadCredentialsFromDB()
     {
-        $tokenFilePath = base_path('app/drivetoken.json');
-        
-        if (file_exists($tokenFilePath)) {
-            $accessToken = json_decode(file_get_contents($tokenFilePath), true);
-            $this->client->setAccessToken($accessToken);
+        // Retrieve credentials from the database
+        $credentials = GoogleApiCredential::first();
+
+        if ($credentials && $credentials->credentials_json) {
+            // Set the client configuration using the credentials stored in DB
+            $this->client->setAuthConfig(json_decode($credentials->credentials_json, true));
+        } else {
+            throw new \Exception('Google API credentials not found in the database.');
         }
     }
 
-    protected function saveAccessToken($accessToken)
-    {
-        $tokenFilePath = storage_path('app/drivetoken.json');
-        file_put_contents($tokenFilePath, json_encode($accessToken));
+
+
+
+    protected function loadAccessToken()
+{
+    // Retrieve the access token from the database
+    $credentials = GoogleApiCredential::first();
+
+    if ($credentials && $credentials->access_token) {
+        $this->client->setAccessToken(json_decode($credentials->access_token, true));
     }
+
+    // If token is expired, refresh and save it back to the database
+    if ($this->client->isAccessTokenExpired()) {
+        $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+        $credentials->update(['access_token' => json_encode($this->client->getAccessToken())]);
+    }
+}
 
     public function uploadFile(UploadedFile $file, string $type)
     {
@@ -79,7 +99,8 @@ class GoogleDriveService
         $refreshToken = $this->client->getRefreshToken();
         if ($refreshToken) {
             $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
-            $this->saveAccessToken($this->client->getAccessToken());
+            // Save the new token back to the database
+            GoogleApiCredential::first()->update(['access_token' => json_encode($this->client->getAccessToken())]);
         } else {
             throw new \Exception('No refresh token available.');
         }
