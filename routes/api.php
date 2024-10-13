@@ -8,6 +8,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GoogleController;
 
 
 
@@ -15,7 +16,7 @@ use App\Http\Controllers\ExpenseController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::post('/upload', [GoogleController::class, 'uploadFile']);
 // Protected route (requires JWT token to access)
 Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
 

@@ -16,6 +16,8 @@ class Expense extends Model
         'description', 
         'amount', 
         'date',
+        'receipt_url',
+
     ];
 
     public function user()

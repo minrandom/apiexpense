@@ -15,7 +15,8 @@ class CreateExpensesTable extends Migration
             $table->foreignId('payment_method_id')->constrained()->onDelete('cascade'); // Foreign key to payment_methods table
             $table->string('description')->nullable();
             $table->decimal('amount', 10, 2); // Amount of the expense
-            $table->date('date'); // Date of the expense
+            $table->dateTime('datetime'); // Date of the expense
+            $table->string('receipt_url')->nullable();; // Date of the expense
             $table->timestamps();
         });
     }

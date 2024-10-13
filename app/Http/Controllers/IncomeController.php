@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Income;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\GoogleDriveService;
+use Carbon\Carbon;
+
 
 class IncomeController extends Controller
 {
@@ -15,6 +18,16 @@ class IncomeController extends Controller
         return response()->json($incomes, 200);
     }
 
+    protected $googleDriveService;
+
+    public function __construct(GoogleDriveService $googleDriveService)
+    {
+        $this->googleDriveService = $googleDriveService;
+    }
+
+
+    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -23,8 +36,21 @@ class IncomeController extends Controller
             'payment_method_id' => 'required|exists:payment_methods,id',
             'notes' => 'nullable|string',
             'datetime' => 'required|date',
-            'receipt_url' => 'nullable|string',
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
+
+        $result = $this->googleDriveService->uploadFile($request->file('file'), 'income');
+
+        // Save expense details to the database (you'll need to implement this part)
+        if (!$result || !isset($result['file_url'])) {
+            return response()->json([
+                'message' => 'File upload failed',
+            ], 500);
+        }
+        // Return success response
+        $image = $result['file_url'];
+
+
 
         $income = Income::create([
             'user_id' => Auth::id(),
@@ -32,8 +58,8 @@ class IncomeController extends Controller
             'category_id' => $request->category_id,
             'payment_method_id' => $request->payment_method_id,
             'notes' => $request->notes,
-            'datetime' => $request->datetime,
-            'receipt_url' => $request->receipt_url,
+            'datetime' => Carbon::now(),
+            'receipt_url' => $image,
         ]);
 
         return response()->json($income, 201);
