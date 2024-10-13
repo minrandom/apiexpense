@@ -94,6 +94,19 @@ class GoogleDriveService
         ];
     }
 
+
+    public function deleteFile($fileId)
+    {
+        try {
+            $driveService = new Google_Service_Drive($this->client);
+            $driveService->files->delete($fileId);
+        } catch (\Exception $e) {
+            // Handle error (optional logging or return a meaningful message)
+            throw new \Exception("Failed to delete file: " . $e->getMessage());
+        }
+    }
+
+
     protected function refreshAccessToken()
     {
         $refreshToken = $this->client->getRefreshToken();

@@ -22,7 +22,7 @@ Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'getProfile']);
-    Route::put('/profile', [ProfileController::class, 'updateProfile']);
+    Route::post('/profile', [ProfileController::class, 'updateProfile']);
 
     Route::get('incomes', [IncomeController::class, 'index']);
     Route::post('incomes', [IncomeController::class, 'store']);
