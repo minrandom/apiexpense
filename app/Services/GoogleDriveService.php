@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Services;
-
+require_once __DIR__ . '/../../vendor/autoload.php';
 use Google_Client;
 use Google_Service_Drive;
 use Illuminate\Http\UploadedFile;
 use App\Models\GoogleApiCredential;
-require_once __DIR__ . '/../../vendor/autoload.php';
+
 
 
 class GoogleDriveService
