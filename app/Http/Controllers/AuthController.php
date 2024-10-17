@@ -34,7 +34,8 @@ class AuthController extends Controller
  
          return response()->json([
              'message' => 'User successfully registered',
-             'token' => $token
+             'token' => $token,
+             'name'=>$user->name,
          ], 201);
      }
  
@@ -46,9 +47,12 @@ class AuthController extends Controller
          if (!$token = JWTAuth::attempt($credentials)) {
              return response()->json(['error' => 'Unauthorized'], 401);
          }
+
+         $user = JWTAuth::user();
  
          return response()->json([
-             'token' => $token
+             'token' => $token,
+             'name' => $user->name // Assuming 'name' is a field in your User model
          ],200);
      }
  
