@@ -6,7 +6,7 @@ use Google_Client;
 use Google_Service_Drive;
 use Illuminate\Http\UploadedFile;
 use App\Models\GoogleApiCredential;
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 class GoogleDriveService
