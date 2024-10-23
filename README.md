@@ -1,66 +1,292 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Expense Tracker API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository contains the Expense Tracker API built using **Laravel** and **MySQL**. The API provides functionality to manage users, profile, income, expenses, categories, and payment methods. It also integrates with **Google Drive** for image uploads and stores receipts and profile pictures.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Features](#features)
+- [Installation](#installation)
+- [API Endpoints](#api-endpoints)
+  - [Authentication](#authentication)
+  - [Profile](#profile)
+  - [Income](#income)
+  - [Expenses](#expenses)
+  - [Categories](#categories)
+  - [Payment Methods](#payment-methods)
+- [Google Drive Integration](#google-drive-integration)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+- JWT-based authentication.
+- CRUD operations for user profiles.
+- CRUD operations for income and expenses, including image uploads (receipts).
+- CRUD operations for categories and payment methods.
+- Image uploads for profile pictures, income receipts, and expense receipts, with Google Drive integration.
+- Role-based routes for users.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/minrandom/apiexpense.git
+   cd apiexpense
+   ```
 
-## Laravel Sponsors
+2. **Install dependencies:**
+   Make sure you have **Composer** installed on your system.
+   ```bash
+   composer install
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. **Set up the environment file:**
+   - Copy the `.env.example` file to `.env`.
+   ```bash
+   cp .env.example .env
+   ```
+   - Configure your database, Google API credentials, and any other necessary environment variables (API keys, email settings, etc.) in the `.env` file.
 
-### Premium Partners
+4. **Generate an application key:**
+   ```bash
+   php artisan key:generate
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+5. **Run migrations:**
+   Set up the database tables by running the migrations.
+   ```bash
+   php artisan migrate
+   ```
 
-## Contributing
+6. **Set up storage link (for image uploads):**
+   Create a symbolic link between storage and public folders.
+   ```bash
+   php artisan storage:link
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7. **Run the application:**
+   ```bash
+   php artisan serve
+   ```
+   The API will be available at `http://localhost:8000`.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## API Endpoints
 
-## Security Vulnerabilities
+### Authentication
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Login**:  
+  `POST /api/login`  
+  **Payload:**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "your_password"
+  }
+  ```
 
-## License
+- **Register**:  
+  `POST /api/register`  
+  **Payload:**
+  ```json
+  {
+    "name": "John Doe",
+    "email": "user@example.com",
+    "password": "your_password",
+    "password_confirmation": "your_password"
+  }
+  ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Logout** (requires JWT token):  
+  `POST /api/logout`
+
+---
+
+### Profile
+
+- **Get Profile** (requires JWT token):  
+  `GET /api/profile`  
+  **Response:**
+  ```json
+  {
+    "id": 1,
+    "user_id": "1",
+    "birthday": "2000-08-10",
+    "gender": "male",
+    "job": "programmer",
+    "profile_pic_url": "https://your-api.com/storage/profile_pictures/filename.jpg",
+    "created_at": "2024-10-18T12:28:42.000000Z",
+    "updated_at": "2024-10-18T12:28:42.000000Z"
+  }
+  ```
+
+- **Update or Create Profile**:  
+  `POST /api/profile`  
+  **Payload:**
+  ```json
+  {
+    "birthday": "1995-05-15",
+    "gender": "male",
+    "job": "developer",
+    "file": "profile_image.jpg"  // file upload (optional)
+  }
+  ```
+
+---
+
+### Income
+
+- **Get All Incomes** (requires JWT token):  
+  `GET /api/incomes`  
+  **Response:**
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": "1",
+      "category_id": "2",
+      "payment_method_id": "3",
+      "amount": "5000",
+      "datetime": "2024-10-18T12:28:42.000000Z",
+      "notes": "Freelance work",
+      "receipt_url": "https://your-api.com/storage/income_receipts/receipt.jpg"
+    }
+  ]
+  ```
+
+- **Add New Income**:  
+  `POST /api/incomes`  
+  **Payload:**
+  ```json
+  {
+    "category_id": "1",
+    "payment_method_id": "2",
+    "amount": "1000",
+    "datetime": "2024-10-20",
+    "notes": "Salary",
+    "file": "income_receipt.jpg"  // file upload (optional)
+  }
+  ```
+
+---
+
+### Expenses
+
+- **Get All Expenses** (requires JWT token):  
+  `GET /api/expenses`  
+  **Response:**
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": "1",
+      "category_id": "2",
+      "payment_method_id": "3",
+      "amount": "2000",
+      "datetime": "2024-10-18T12:28:42.000000Z",
+      "notes": "Groceries",
+      "receipt_url": "https://your-api.com/storage/expense_receipts/receipt.jpg"
+    }
+  ]
+  ```
+
+- **Add New Expense**:  
+  `POST /api/expenses`  
+  **Payload:**
+  ```json
+  {
+    "category_id": "1",
+    "payment_method_id": "2",
+    "amount": "150",
+    "datetime": "2024-10-20",
+    "notes": "Dinner",
+    "file": "expense_receipt.jpg"  // file upload (optional)
+  }
+  ```
+
+---
+
+### Categories
+
+- **Get All Categories** (requires JWT token):  
+  `GET /api/categories`  
+  **Response:**
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "Salary",
+      "type": "income"
+    },
+    {
+      "id": 2,
+      "name": "Groceries",
+      "type": "expense"
+    }
+  ]
+  ```
+
+- **Add New Category**:  
+  `POST /api/categories`  
+  **Payload:**
+  ```json
+  {
+    "name": "Bonus",
+    "type": "income"
+  }
+  ```
+
+---
+
+### Payment Methods
+
+- **Get All Payment Methods** (requires JWT token):  
+  `GET /api/payment-methods`  
+  **Response:**
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "Credit Card",
+      "user_id": null  // system-wide method, available to all users
+    },
+    {
+      "id": 2,
+      "name": "Bank Transfer",
+      "user_id": "1"  // user-specific method
+    }
+  ]
+  ```
+
+- **Add New Payment Method**:  
+  `POST /api/payment-methods`  
+  **Payload:**
+  ```json
+  {
+    "name": "PayPal"
+  }
+  ```
+
+---
+
+## Google Drive Integration
+
+The **Google Drive** integration allows users to upload receipts and profile pictures to Google Drive. Follow these steps to configure Google Drive API:
+
+1. Obtain Google API credentials and create a new project in the **Google Cloud Console**.
+2. Enable the **Google Drive API** for your project.
+3. Download the credentials file (`credentials.json`) and store it in the `app/` folder of your Laravel project.
+4. Set up the `GoogleDriveService` class for uploading files.
+
+To upload files, use the endpoints for profile, income, or expense with the `file` field in the payload.
+
+---
+
+That's it! 🎉 You are now ready to run the Expense Tracker API and integrate it with your frontend.
+
+---
+
+You can copy this to your `README.md`, and make any tweaks based on additional configurations or routes you might add later. Let me know if you need further adjustments!
