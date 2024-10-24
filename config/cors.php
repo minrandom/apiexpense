@@ -17,13 +17,13 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie', 'public/*', 'storage/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['PUT, GET, POST, DELETE, OPTIONS'],
 
     'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['origin, x-requested-with, content-type'],
 
     'exposed_headers' => [],
 
