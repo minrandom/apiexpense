@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Income;
+use App\Models\Profile;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use App\Services\GoogleDriveService;
+use Illuminate\Support\Facades\Storage; // For file storage
 use Carbon\Carbon;
+
 
 
 class IncomeController extends Controller
@@ -16,17 +19,7 @@ class IncomeController extends Controller
     {
         $incomes = Income::where('user_id', Auth::id())->with(['category', 'paymentMethod'])->get();
         return response()->json($incomes, 200);
-    }
-
-    protected $googleDriveService;
-
-    public function __construct(GoogleDriveService $googleDriveService)
-    {
-        $this->googleDriveService = $googleDriveService;
-    }
-
-
-    
+    }    
 
     public function store(Request $request)
     {
@@ -35,21 +28,21 @@ class IncomeController extends Controller
             'category_id' => 'required|exists:categories,id',
             'payment_method_id' => 'required|exists:payment_methods,id',
             'notes' => 'nullable|string',
-            'datetime' => 'required|date',
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $result = $this->googleDriveService->uploadFile($request->file('file'), 'income');
+        $profile = Profile::where('user_id', Auth::id())->first();
 
-        // Save expense details to the database (you'll need to implement this part)
-        if (!$result || !isset($result['file_url'])) {
-            return response()->json([
-                'message' => 'File upload failed',
-            ], 500);
+        $imageUrl = null;
+        if ($request->hasFile('file')) {
+            // Upload the new file to the server
+            $uploadedFile = $request->file('file');
+            $fileName = time() . '_income_'.$profile->id.".".$uploadedFile->getClientOriginalExtension() ;
+            $filePath = $uploadedFile->storeAs('incomes', $fileName, 'public'); // Save to 'storage/app/public/profile_pictures/'
+
+            // Save the uploaded file URL
+            $imageUrl = Storage::url($filePath); // This will create a public URL
         }
-        // Return success response
-        $image = $result['file_url'];
-
 
 
         $income = Income::create([
@@ -59,7 +52,7 @@ class IncomeController extends Controller
             'payment_method_id' => $request->payment_method_id,
             'notes' => $request->notes,
             'datetime' => Carbon::now(),
-            'receipt_url' => $image,
+            'receipt_url' => $imageUrl,
         ]);
 
         return response()->json($income, 201);
