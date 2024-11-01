@@ -96,7 +96,7 @@ class IncomeController extends Controller
             // Save the uploaded file URL
             $imageUrl = Storage::url($filePath); // This will create a public URL
         }
-        dd($imageUrl);
+     
 
         $income->update([
             'user_id' => Auth::id(),
