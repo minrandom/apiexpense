@@ -84,9 +84,13 @@ class IncomeController extends Controller
 
         $imageUrl = null;
         if ($request->hasFile('file')) {
+            if ($income->receipt_url) {
+                $oldFilePath = str_replace('/storage/', '', $income->receipt_url);
+                Storage::disk('public')->delete($oldFilePath);
+            }
             // Upload the new file to the server
             $uploadedFile = $request->file('file');
-            $fileName = now() . '_income_'.$profile->id.".".$uploadedFile->getClientOriginalExtension() ;
+            $fileName = time() . '_income_'.$profile->id.".".$uploadedFile->getClientOriginalExtension() ;
             $filePath = $uploadedFile->storeAs('incomes', $fileName, 'public'); // Save to 'storage/app/public/profile_pictures/'
 
             // Save the uploaded file URL
