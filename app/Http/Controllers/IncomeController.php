@@ -78,10 +78,32 @@ class IncomeController extends Controller
             'payment_method_id' => 'sometimes|required|exists:payment_methods,id',
             'notes' => 'nullable|string',
             'datetime' => 'sometimes|required|date',
-            'receipt_url' => 'nullable|string',
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+        $profile = Profile::where('user_id', Auth::id())->first();
+
+        $imageUrl = null;
+        if ($request->hasFile('file')) {
+            // Upload the new file to the server
+            $uploadedFile = $request->file('file');
+            $fileName = now() . '_income_'.$profile->id.".".$uploadedFile->getClientOriginalExtension() ;
+            $filePath = $uploadedFile->storeAs('incomes', $fileName, 'public'); // Save to 'storage/app/public/profile_pictures/'
+
+            // Save the uploaded file URL
+            $imageUrl = Storage::url($filePath); // This will create a public URL
+        }
+        dd($imageUrl);
+
+        $income->update([
+            'user_id' => Auth::id(),
+            'value' => $request->value,
+            'category_id' => $request->category_id,
+            'payment_method_id' => $request->payment_method_id,
+            'notes' => $request->notes,
+            'datetime' => Carbon::now(),
+            'receipt_url' => $imageUrl,
         ]);
 
-        $income->update($request->only('value', 'category_id', 'payment_method_id', 'notes', 'datetime', 'receipt_url'));
 
         return response()->json($income, 200);
     }
