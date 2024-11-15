@@ -27,27 +27,27 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('incomes', [IncomeController::class, 'index']);
     Route::post('incomes', [IncomeController::class, 'store']);
     Route::get('incomes/{id}', [IncomeController::class, 'show']);
-    Route::put('incomes/update/{id}', [IncomeController::class, 'update']);
+    Route::patch('incomes/update/{id}', [IncomeController::class, 'update']);
     Route::delete('incomes/{id}', [IncomeController::class, 'destroy']);
 
 
         // Category Routes
     Route::get('categories', [CategoryController::class, 'index']);
     Route::post('categories', [CategoryController::class, 'store']);
-    Route::put('categories/update/{id}', [CategoryController::class, 'update']);
+    Route::patch('categories/update/{id}', [CategoryController::class, 'update']);
     Route::delete('categories/{id}', [CategoryController::class, 'destroy']);
     
         // Payment Method Routes
     Route::get('payment-methods', [PaymentMethodController::class, 'index']);
     Route::post('payment-methods', [PaymentMethodController::class, 'store']);
-    Route::put('payment-methods/update/{id}', [PaymentMethodController::class, 'update']);
+    Route::patch('payment-methods/update/{id}', [PaymentMethodController::class, 'update']);
     Route::delete('payment-methods/{id}', [PaymentMethodController::class, 'destroy']);
     
 
         // Expense Routes
     Route::get('expenses', [ExpenseController::class, 'index']);
     Route::post('expenses', [ExpenseController::class, 'store']);
-    Route::put('expenses/update/{id}', [ExpenseController::class, 'update']);
+    Route::patch('expenses/update/{id}', [ExpenseController::class, 'update']);
     Route::delete('expenses/{id}', [ExpenseController::class, 'destroy']);
     Route::get('expenses/{id}', [ExpenseController::class, 'show']); 
 
