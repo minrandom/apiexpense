@@ -117,6 +117,6 @@ class IncomeController extends Controller
         $income = Income::findOrFail($id);
         $income->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['messages'=>'delete success'], 204);
     }
 }
